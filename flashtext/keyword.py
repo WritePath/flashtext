@@ -447,7 +447,7 @@ class KeywordProcessor(object):
                     terms_present[key] = sub_values[key]
         return terms_present
 
-    def extract_keywords(self, sentence, span_info=False):
+    def extract_keywords(self, sentence, span_info=False, space_separated=False):
         """Searches in the string for all keywords present in corpus.
         Keywords present are added to a list `keywords_extracted` and returned.
 
@@ -468,6 +468,9 @@ class KeywordProcessor(object):
 
         """
         keywords_extracted = []
+        idx_shift = 0
+        if space_separated:
+            idx_shift = -1
         if not sentence:
             # if sentence is empty or none just return empty list
             return keywords_extracted
@@ -523,7 +526,7 @@ class KeywordProcessor(object):
                             idx = sequence_end_pos - 1
                     current_dict = self.keyword_trie_dict
                     if longest_sequence_found:
-                        keywords_extracted.append((longest_sequence_found, sequence_start_pos, idx))
+                        keywords_extracted.append((longest_sequence_found, sequence_start_pos, idx + idx_shift))
                     reset_current_dict = True
                 else:
                     # we reset current_dict
@@ -548,7 +551,7 @@ class KeywordProcessor(object):
             if idx + 1 >= sentence_len:
                 if self._keyword in current_dict:
                     sequence_found = current_dict[self._keyword]
-                    keywords_extracted.append((sequence_found, sequence_start_pos, sentence_len))
+                    keywords_extracted.append((sequence_found, sequence_start_pos, sentence_len + idx_shift))
             idx += 1
             if reset_current_dict:
                 reset_current_dict = False
